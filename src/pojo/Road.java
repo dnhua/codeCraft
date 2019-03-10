@@ -8,6 +8,7 @@ public class Road {
     private int beginId;    //起始点id
     private int endId;      //终点id
     private boolean isBidirectional;    //是否双向
+    static public final int numberPara = 7;
 
     public int getId() {
         return id;
