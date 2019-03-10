@@ -1,5 +1,8 @@
 package test;
 
+import org.junit.jupiter.api.Test;
+import pojo.Car;
+import pojo.Cross;
 import pojo.Road;
 import utils.ReadData;
 
@@ -9,13 +12,24 @@ import java.util.List;
 public class TestUtils {
     List<Road> list;
 
-    @org.junit.jupiter.api.Test
-    public void testReadRoads() {
-        List<Road> list;
-        try {
-            list = ReadData.readRoads("data/roads.txt");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @Test
+    public void testReadRoad() {
+        List<Road> listroad;
+        listroad = ReadData.readRoad("data/Cross.txt");
+        System.out.println(listroad);
+    }
+
+    @Test
+    public void testReadCar() {
+        List<Car> listCar;
+        listCar = ReadData.readCar("data/Car.txt");
+        System.out.println(listCar);
+    }
+
+    @Test
+    public void testReadCross() {
+        List<Cross> listCross;
+        listCross = ReadData.readCross("data/Cross.txt");
+        System.out.println(listCross);
     }
 }

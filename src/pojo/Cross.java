@@ -6,6 +6,7 @@ public class Cross {
     private int roadId2;
     private int roadId3;
     private int roadId4;
+    static public final int numberPara = 5;
 
     public int getId() {
         return id;

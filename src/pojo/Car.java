@@ -6,6 +6,7 @@ public class Car {
     private int endId;      //目的地
     private int speedLimit;    //最高速度
     private int departTime;    //出发时间
+    static public final int numberPara = 5;
 
     public int getId() {
         return id;
