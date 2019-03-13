@@ -11,15 +11,27 @@ import java.util.List;
 public class ScheduleRoadImpl implements ScheduleRoad {
     List<RoadInschedule> roads;
 
+    public ScheduleRoadImpl(List<RoadInschedule> roads) {
+        this.roads = roads;
+    }
+
     @Override
     public void updateOne(Lane lane) {
         Deque<CarInschedule> cars = lane.getCars();
         Iterator<CarInschedule> it = cars.iterator();
+        CarInschedule car;
+        CarInschedule carLast = null;
         //对于第一辆车
-        CarInschedule car = it.next();
+        if (it.hasNext()) {
+            car = it.next();
+            setCarByInfo(car, null);
+            carLast = car;
+        }
 
         while (it.hasNext()) {
-
+            car = it.next();
+            setCarByInfo(car, carLast);
+            carLast = car;
         }
     }
 
@@ -29,26 +41,47 @@ public class ScheduleRoadImpl implements ScheduleRoad {
             //如果此时间片该车到达出路口位置
             if (car.getLocation()+car.getRealspeed()>=car.getDistance()) {
                 car.setWaitflag(true);
+                car.setLocation(car.getDistance());
             } else {    //否则更新location
                 car.setLocation(car.getLocation()+car.getRealspeed());
+                car.setStopflag(true);
             }
         } else {
-
+            int s = carLast.getLocation() - car.getLocation();
+            //如果前面一辆车处于等待状态
+            if (carLast.isWaitflag() && s < car.getRealspeed()) {
+                car.setWaitflag(true);
+                car.setLocation(car.getDistance());
+            } else if (carLast.isStopflag() && s < car.getRealspeed()) {
+                car.setStopflag(true);
+                car.setRealspeed(Math.min(car.getRealspeed(), s));
+                car.setLocation(car.getLocation()+car.getRealspeed());
+            } else {
+                car.setStopflag(true);
+                car.setLocation(car.getLocation()+car.getRealspeed());
+            }
         }
     }
 
     @Override
     public void updateOneRoad(RoadInschedule road) {
-
+        List<Lane> lanes = road.getLanes();
+        for (Lane lane : lanes) {
+            updateOne(lane);
+        }
     }
 
     @Override
     public void updateAll() {
-
+        for (RoadInschedule road : roads) {
+            updateOneRoad(road);
+        }
     }
 
     @Override
     public void updateAll(List<RoadInschedule> roads) {
-
+        for (RoadInschedule road : roads) {
+            updateOneRoad(road);
+        }
     }
 }
