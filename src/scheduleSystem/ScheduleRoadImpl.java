@@ -15,6 +15,10 @@ public class ScheduleRoadImpl implements ScheduleRoad {
         this.roads = roads;
     }
 
+    public ScheduleRoadImpl() {
+
+    }
+
     @Override
     public void updateOne(Lane lane) {
         Deque<CarInschedule> cars = lane.getCars();
@@ -39,20 +43,27 @@ public class ScheduleRoadImpl implements ScheduleRoad {
         //判断是否是第一辆车(最靠近下一个路口的车)
         if (carLast==null) {
             //如果此时间片该车到达出路口位置
-            if (car.getLocation()+car.getRealspeed()>=car.getDistance()) {
+            if (car.getLocation() + car.getRealspeed() >= car.getDistance()) {
                 car.setWaitflag(true);
                 car.setLocation(car.getDistance());
+                car.setCanOutCross(true);
             } else {    //否则更新location
                 car.setLocation(car.getLocation()+car.getRealspeed());
                 car.setStopflag(true);
+                if (car.getLocation() + car.getRealspeed() > car.getDistance())
+                    car.setCanOutCross(true);
             }
         } else {
             int s = carLast.getLocation() - car.getLocation();
             //如果前面一辆车处于等待状态
-            if (carLast.isWaitflag() && s < car.getRealspeed()) {
-                car.setWaitflag(true);
-                car.setLocation(car.getDistance());
-            } else if (carLast.isStopflag() && s < car.getRealspeed()) {
+            if (carLast.isWaitflag()) {
+                car.setWaitflag(true);  //更新状态
+                //如果当前车速*时间大于s
+                if (s < car.getRealspeed())
+                    car.setLocation(carLast.getLocation());
+                else
+                    car.setLocation(car.getLocation() + car.getRealspeed());
+            } else if (carLast.isStopflag()) {
                 car.setStopflag(true);
                 car.setRealspeed(Math.min(car.getRealspeed(), s));
                 car.setLocation(car.getLocation()+car.getRealspeed());
