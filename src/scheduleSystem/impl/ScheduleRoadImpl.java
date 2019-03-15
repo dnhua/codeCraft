@@ -1,10 +1,9 @@
-package scheduleSystem;
+package scheduleSystem.impl;
 
 import pojo.CarInschedule;
 import pojo.Lane;
 import pojo.RoadInschedule;
-
-import javax.swing.text.html.parser.Entity;
+import scheduleSystem.ScheduleRoad;
 import java.util.*;
 
 public class ScheduleRoadImpl implements ScheduleRoad {

@@ -1,13 +1,9 @@
-package scheduleSystem;
+package scheduleSystem.impl;
 
-import pojo.Cross;
-import pojo.CrossInschedule;
-import pojo.RoadInschedule;
+import pojo.*;
+import scheduleSystem.ScheduleCross;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class ScheduleCrossImpl implements ScheduleCross {
     //PriorityQueue<RoadInschedule> roadsInCross = new PriorityQueue<>();
@@ -35,8 +31,30 @@ public class ScheduleCrossImpl implements ScheduleCross {
     }
 
     @Override
-    public void scheduleOneCross() {
+    public void scheduleOneCross(CrossInschedule crossInschedule) {
+        PriorityQueue<RoadInschedule> roadsInCross = crossInschedule.getRoadsInCross();
+        //对于每条路(按优先级选取)
+        for (RoadInschedule road : roadsInCross) {
+            //选择一辆在排队的车
 
+        }
+        //
+    }
+
+    /**
+     * 选一辆在等待车，无论是否与其他车发生冲突。
+     * 并且记录当前车道是否还存在等待的车。
+     * @param road
+     * @return
+     */
+    private CarInschedule getCarFromRoad(RoadInschedule road) {
+        for (Lane lane : road.getLanes()) {
+            Deque<CarInschedule> cars = lane.getCars();
+            for (CarInschedule car : cars) {
+                //if (car.isWaitflag() && )
+            }
+        }
+        return null;
     }
 
     @Override

@@ -3,12 +3,11 @@ package scheduleSystem;
 import org.junit.jupiter.api.Test;
 import pojo.CarInschedule;
 import pojo.Lane;
+import scheduleSystem.impl.ScheduleRoadImpl;
 
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ScheduleRoadImplTest {
 
