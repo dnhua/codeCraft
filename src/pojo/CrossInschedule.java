@@ -2,7 +2,7 @@ package pojo;
 
 import java.util.PriorityQueue;
 
-public class CrossInschedule {
+public class CrossInschedule implements Comparable{
     private int id;
     PriorityQueue<RoadInschedule> roadsInCross = new PriorityQueue<RoadInschedule>();
 
@@ -20,5 +20,15 @@ public class CrossInschedule {
 
     public void setRoadsInCross(PriorityQueue<RoadInschedule> roadsInCross) {
         this.roadsInCross = roadsInCross;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        CrossInschedule cross = (CrossInschedule) o;
+        if (this.id < cross.id)
+            return -1;
+        if (this.id > cross.id)
+            return 1;
+        return 0;
     }
 }
