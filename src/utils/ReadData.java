@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ReadData {
@@ -92,6 +93,12 @@ public class ReadData {
                     cross.setRoadId2(Integer.parseInt(info[2]));
                     cross.setRoadId3(Integer.parseInt(info[3]));
                     cross.setRoadId4(Integer.parseInt(info[4]));
+                    List<Integer> roadIdList = new LinkedList<>();
+                    roadIdList.add(cross.getRoadId1());
+                    roadIdList.add(cross.getRoadId2());
+                    roadIdList.add(cross.getRoadId3());
+                    roadIdList.add(cross.getRoadId4());
+                    cross.setRoadIdList(roadIdList);
                     list.add(cross);
                 }
             }
