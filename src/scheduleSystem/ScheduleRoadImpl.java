@@ -4,15 +4,14 @@ import pojo.CarInschedule;
 import pojo.Lane;
 import pojo.RoadInschedule;
 
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
+import javax.swing.text.html.parser.Entity;
+import java.util.*;
 
 public class ScheduleRoadImpl implements ScheduleRoad {
-    List<RoadInschedule> roads;
+    Map<Integer, RoadInschedule> roads = new HashMap<>();
 
     public ScheduleRoadImpl(List<RoadInschedule> roads) {
-        this.roads = roads;
+        //for
     }
 
     public ScheduleRoadImpl() {
@@ -84,15 +83,23 @@ public class ScheduleRoadImpl implements ScheduleRoad {
 
     @Override
     public void updateAll() {
-        for (RoadInschedule road : roads) {
-            updateOneRoad(road);
+        for (Map.Entry<Integer, RoadInschedule> entry : roads.entrySet()) {
+            updateOneRoad(entry.getValue());
         }
     }
 
     @Override
     public void updateAll(List<RoadInschedule> roads) {
-        for (RoadInschedule road : roads) {
-            updateOneRoad(road);
-        }
+//        for (RoadInschedule road : roads) {
+//            updateOneRoad(road);
+//        }
+    }
+
+    public Map<Integer, RoadInschedule> getRoads() {
+        return roads;
+    }
+
+    public void setRoads(Map<Integer, RoadInschedule> roads) {
+        this.roads = roads;
     }
 }
