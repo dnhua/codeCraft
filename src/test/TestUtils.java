@@ -17,6 +17,7 @@ public class TestUtils {
         List<Road> listroad;
         listroad = ReadData.readRoad("data/Roads.txt");
         System.out.println(listroad);
+
     }
 
     @Test

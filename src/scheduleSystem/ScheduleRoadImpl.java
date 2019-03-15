@@ -15,6 +15,10 @@ public class ScheduleRoadImpl implements ScheduleRoad {
         this.roads = roads;
     }
 
+    public ScheduleRoadImpl() {
+
+    }
+
     @Override
     public void updateOne(Lane lane) {
         Deque<CarInschedule> cars = lane.getCars();
