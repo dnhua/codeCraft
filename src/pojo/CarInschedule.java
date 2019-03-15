@@ -3,6 +3,7 @@ package pojo;
 public class CarInschedule {
     private int id;
     private int roadid;
+    private int nextroadid;
     private int location;
     private boolean waitflag = false;
     private boolean stopflag = false;
