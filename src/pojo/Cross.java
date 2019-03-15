@@ -1,11 +1,15 @@
 package pojo;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Cross {
     private int id;
     private int roadId1;
     private int roadId2;
     private int roadId3;
     private int roadId4;
+    private List<Integer> roadIdList = new LinkedList<>();
     static public final int numberPara = 5;
 
     public int getId() {
@@ -48,6 +52,14 @@ public class Cross {
         this.roadId4 = roadId4;
     }
 
+    public List<Integer> getRoadIdList() {
+        return roadIdList;
+    }
+
+    public void setRoadIdList(List<Integer> roadIdList) {
+        this.roadIdList = roadIdList;
+    }
+
     @Override
     public String toString() {
         return "Cross{" +
@@ -56,6 +68,7 @@ public class Cross {
                 ", roadId2=" + roadId2 +
                 ", roadId3=" + roadId3 +
                 ", roadId4=" + roadId4 +
+                ", roadIdList=" + roadIdList +
                 '}';
     }
 }
