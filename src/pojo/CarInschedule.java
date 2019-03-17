@@ -10,6 +10,9 @@ public class CarInschedule {
     private int speedlimit;
     private int realspeed;
     private int distance;
+    private boolean canOutCross = false;
+    private int direction = 3;  //3直行，2是左转，1是右转。默认直行，在每次变为等待状态时应该更新方向。
+
 
     public boolean isCanOutCross() {
         return canOutCross;
@@ -19,10 +22,6 @@ public class CarInschedule {
         this.canOutCross = canOutCross;
     }
 
-    private boolean canOutCross = false;
-
-
-
     public int getDirection() {
         return direction;
     }
@@ -30,9 +29,6 @@ public class CarInschedule {
     public void setDirection(int direction) {
         this.direction = direction;
     }
-
-    private int direction = 3;  //3直行，2是左转，1是右转。默认直行，
-                                //在每次变为等待状态时应该更新方向。
 
     public int getDistance() {
         return distance;

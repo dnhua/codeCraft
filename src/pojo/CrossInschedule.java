@@ -1,10 +1,15 @@
 package pojo;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.PriorityQueue;
 
 public class CrossInschedule implements Comparable{
     private int id;
-    PriorityQueue<RoadInschedule> roadsInCross = new PriorityQueue<RoadInschedule>();
+    private List<Integer> roadids = new ArrayList<>();
+    private PriorityQueue<RoadInschedule> roadsPQ = new PriorityQueue<RoadInschedule>();
+    private List<RoadInschedule> roadsList = new ArrayList<>();
 
     public int getId() {
         return id;
@@ -14,12 +19,28 @@ public class CrossInschedule implements Comparable{
         this.id = id;
     }
 
-    public PriorityQueue<RoadInschedule> getRoadsInCross() {
-        return roadsInCross;
+    public PriorityQueue<RoadInschedule> getRoadsPQ() {
+        return roadsPQ;
     }
 
-    public void setRoadsInCross(PriorityQueue<RoadInschedule> roadsInCross) {
-        this.roadsInCross = roadsInCross;
+    public List<RoadInschedule> getRoadsList() {
+        return roadsList;
+    }
+
+    public void setRoadsList(List<RoadInschedule> roadsList) {
+        this.roadsList = roadsList;
+    }
+
+    public void setRoadsPQ(PriorityQueue<RoadInschedule> roadsInCross) {
+        this.roadsPQ = roadsInCross;
+    }
+
+    public List getRoadids() {
+        return roadids;
+    }
+
+    public void setRoadids(List roadids) {
+        this.roadids = roadids;
     }
 
     @Override
