@@ -1,4 +1,4 @@
-package scheduleSystem.impl;
+package scheduleSystem;
 
 import org.junit.jupiter.api.Test;
 
