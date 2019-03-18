@@ -4,6 +4,7 @@ public class CarInschedule {
     private int id;
     private int roadid;
     private int nextroadid;
+    private int laneid;
     private int location;
     private boolean waitflag = false;
     private boolean stopflag = false;
@@ -11,8 +12,16 @@ public class CarInschedule {
     private int realspeed;
     private int distance;
     private boolean canOutCross = false;
+    private int roadspeedlimit;
     private int direction = 3;  //3直行，2是左转，1是右转。默认直行，在每次变为等待状态时应该更新方向。
 
+    public int getLaneid() {
+        return laneid;
+    }
+
+    public void setLaneid(int laneid) {
+        this.laneid = laneid;
+    }
 
     public boolean isCanOutCross() {
         return canOutCross;
@@ -37,8 +46,6 @@ public class CarInschedule {
     public void setDistance(int distance) {
         this.distance = distance;
     }
-
-    private int roadspeedlimit;
 
     public int getId() {
         return id;
@@ -102,5 +109,13 @@ public class CarInschedule {
 
     public void setRoadspeedlimit(int roadspeedlimit) {
         this.roadspeedlimit = roadspeedlimit;
+    }
+
+    public int getNextroadid() {
+        return nextroadid;
+    }
+
+    public void setNextroadid(int nextroadid) {
+        this.nextroadid = nextroadid;
     }
 }

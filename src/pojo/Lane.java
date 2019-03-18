@@ -5,16 +5,24 @@ import java.util.LinkedList;
 
 public class Lane {
     private Deque<CarInschedule> cars = new LinkedList<>();
+    private boolean isDone = false;
+    private int roadid;
 
     public boolean isDone() {
         return isDone;
     }
 
+    public int getRoadid() {
+        return roadid;
+    }
+
+    public void setRoadid(int roadid) {
+        this.roadid = roadid;
+    }
+
     public void setDone(boolean done) {
         isDone = done;
     }
-
-    private boolean isDone = false;
 
     public Deque<CarInschedule> getCars() {
         return cars;

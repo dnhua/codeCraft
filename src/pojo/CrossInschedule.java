@@ -1,15 +1,27 @@
 package pojo;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
 
 public class CrossInschedule implements Comparable{
     private int id;
     private List<Integer> roadids = new ArrayList<>();
-    private PriorityQueue<RoadInschedule> roadsPQ = new PriorityQueue<RoadInschedule>();
-    private List<RoadInschedule> roadsList = new ArrayList<>();
+    private List<RoadInschedule> roadsPQ = new ArrayList<>();   //实际上未必有序，每次要用时应当先排序
+    private List<RoadInschedule> roadsList = new ArrayList<>(); //按逆时针顺序存储的数据
+
+    public void update (RoadInschedule road) {
+        for (RoadInschedule rd : roadsPQ) {
+            if (rd.getId() == road.getId()) {
+                roadsPQ.remove(rd);
+                roadsPQ.add(road);
+            }
+        }
+        for (int i=0; i<roadsList.size(); i++) {
+            if (road.getId() == roadsList.get(i).getId())
+                roadsList.set(i, road);
+        }
+
+    }
 
     public int getId() {
         return id;
@@ -19,7 +31,7 @@ public class CrossInschedule implements Comparable{
         this.id = id;
     }
 
-    public PriorityQueue<RoadInschedule> getRoadsPQ() {
+    public List<RoadInschedule> getRoadsPQ() {
         return roadsPQ;
     }
 
@@ -31,7 +43,7 @@ public class CrossInschedule implements Comparable{
         this.roadsList = roadsList;
     }
 
-    public void setRoadsPQ(PriorityQueue<RoadInschedule> roadsInCross) {
+    public void setRoadsPQ(List<RoadInschedule> roadsInCross) {
         this.roadsPQ = roadsInCross;
     }
 
