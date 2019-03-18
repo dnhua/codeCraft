@@ -24,7 +24,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
             crossInschedule.setRoadids(idlist);
             //设置每个cross的道路list
             //设置每个cross的道路优先队列
-            PriorityQueue<RoadInschedule> roadsPQ = new PriorityQueue<RoadInschedule>();   //roadsPQ保存此cross的路
+            List<RoadInschedule> roadsPQ = new ArrayList<>();   //roadsPQ保存此cross的路
             List roadList = new ArrayList();    //roadList保存此cross的路
             List<Integer> roadIdlist = cross.getRoadIdList();
             for (int i=0; i<4; i++) {
@@ -42,17 +42,60 @@ public class ScheduleCrossImpl implements ScheduleCross {
 
     @Override
     public void scheduleOneCross(CrossInschedule crossInschedule) {
-        PriorityQueue<RoadInschedule> roadsPQ = crossInschedule.getRoadsPQ();
+        List<RoadInschedule> roadsPQ = crossInschedule.getRoadsPQ();
+        Collections.sort(roadsPQ);
         //对于每条路(按优先级选取)
-        for (RoadInschedule road : roadsPQ) {
+        for (int i=0; i<roadsPQ.size(); i++) {
+            RoadInschedule road = roadsPQ.get(i);
             //选择一辆在排队的车
             CarInschedule car = getCarFromRoad(road);
             //如果car为空，或者冲突了，跳过这条路
             if (car == null || isConflicted(crossInschedule, road, car))
                 continue;   //这里有bug隐患，四条路都为空/冲突如何跳出循环
-
+            int roadid = car.getRoadid();
+            //如果没有冲突，则将该车调度一个时间片的距离
+            //1.判断是否该车是否可以通过下一个车道
+            if (!car.isCanOutCross()) {
+                car.setLocation(car.getLocation() + car.getRealspeed());
+                road.updateFirst(car);
+                crossInschedule.update(road);
+                continue;
+            }
+            //2.选择车道
+            int ilane = choiceLane(road);
+            if (ilane == -1)
+                continue;
+            //3.计算在下一个车道可以行进的距离
+            int s2 = calcNextRoadMaxDistance(crossInschedule, car);
+            //4.更新car，更新road，旧road里面的car要删除，新road添加
+            RoadInschedule nextRoad = getNextRoad(crossInschedule, car);
+            int nextroadid = roadsPQ.indexOf(nextRoad);
+            car.setLocation(s2);
+            car.setRoadspeedlimit(nextRoad.getSpeedLimit());
+            car.setRealspeed(Math.min(car.getRoadspeedlimit(), car.getRoadspeedlimit()));
+            road.remove(car);   //删除旧road里面的car
+            car.setLaneid(ilane);
+            //更新road？？
+            nextRoad.updateLast(car);
+            //5.更新roadsPQ
+            roadsPQ.remove(nextRoad);
+            roadsPQ.set(i, road);
+            roadsPQ.set(nextroadid, nextRoad);
         }
+        //更新cross
+        crossInschedule.setRoadsPQ(roadsPQ);
+        //crossInschedule.setRoadsList();
+    }
 
+    @Override
+    public void scheduleAllCross() {
+        PriorityQueue<CrossInschedule> crosses1 = new PriorityQueue<>();
+        while (crosses.isEmpty()) {
+            CrossInschedule cross = crosses.remove();
+            scheduleOneCross(cross);
+            crosses1.add(cross);
+        }
+        this.crosses = crosses1;
     }
 
     /**
@@ -136,17 +179,81 @@ public class ScheduleCrossImpl implements ScheduleCross {
         return null;
     }
 
-    private List getRoadIdList(Cross cross) {
+    private int choiceLane(RoadInschedule road) {
+        List<Lane> lanes = road.getLanes();
+        int i = 0;
+        for (; i<lanes.size(); i++) {
+            Deque<CarInschedule> cars = lanes.get(i).getCars();
+            CarInschedule last = cars.getLast();
+            if (last.getLocation() > 0)
+                return i;
+        }
+        return -1;
+    }
+
+    private int calcNextRoadMaxDistance(CrossInschedule cross, CarInschedule car) {
+        //通过car得到下一条路
+        int nextroadid = car.getNextroadid();
+        RoadInschedule nextroadInschedule = getNextRoad(cross, car);
+        int nextspeedLimit = nextroadInschedule.getSpeedLimit();
+        int v2 = Math.min(car.getSpeedlimit(), nextspeedLimit);
+        int s1 = car.getDistance() - car.getLocation();
+        int s2 = v2 > s1 ? v2 - s1 : 0;
+        return s2;
+    }
+
+    private RoadInschedule getNextRoad (CrossInschedule cross, CarInschedule car) {
+        //通过car得到下一条路
+        int nextroadid = car.getNextroadid();
+        List roadids = cross.getRoadids();
+        int i = roadids.indexOf(nextroadid);
+        RoadInschedule nextroadInschedule = cross.getRoadsList().get(i);
+        return nextroadInschedule;
+    }
+
+    private RoadInschedule getNextRoad (CrossInschedule cross, int nextroadid) {
+        //通过car得到下一条路
+        List roadids = cross.getRoadids();
+        int i = roadids.indexOf(nextroadid);
+        RoadInschedule nextroadInschedule = cross.getRoadsList().get(i);
+        return nextroadInschedule;
+    }
+
+    /**
+     *
+     * @param cross
+     * @param
+     * @return lane
+     */
+//    private RoadInschedule choiceAndUpdateRoad (CrossInschedule cross, CarInschedule car) {
+//        RoadInschedule road = null;
+//        //通过car得到下一条路
+//        int nextroadid = car.getNextroadid();
+//        List roadids = cross.getRoadids();
+//        int i = roadids.indexOf(nextroadid);
+//        RoadInschedule roadInschedule = cross.getRoadsList().get(i);
+//
+//        //依次判断每个lane是否有合适的位置
+//        List<Lane> lanes = roadInschedule.getLanes();
+//        for (Lane l : lanes) {
+//            Deque<CarInschedule> cars = l.getCars();
+//            CarInschedule last = cars.getLast();
+//            //如果该车道有位置
+//            if (last.getLocation() > 1) {
+//
+//            }
+//        }
+//        return null;
+//    }
+
+
+
+    public List getRoadIdList(Cross cross) {
         List idlist = new ArrayList();
         idlist.add(cross.getRoadId1());
         idlist.add(cross.getRoadId2());
         idlist.add(cross.getRoadId3());
         idlist.add(cross.getRoadId4());
         return idlist;
-    }
-
-    @Override
-    public void scheduleAllCross() {
-
     }
 }

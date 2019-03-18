@@ -10,7 +10,7 @@ public class ScheduleRoadImpl implements ScheduleRoad {
     Map<Integer, RoadInschedule> roads = new HashMap<>();
 
     public ScheduleRoadImpl(List<RoadInschedule> roads) {
-        //for
+
     }
 
     public ScheduleRoadImpl() {
