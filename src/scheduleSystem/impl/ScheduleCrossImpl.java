@@ -76,9 +76,10 @@ public class ScheduleCrossImpl implements ScheduleCross {
             road.remove(car);   //删除旧road里面的car
             car.setLaneid(ilane);
             //更新road？？
-            nextRoad.updateLast(car);
+            nextRoad.updateLast(car);   //当集合里面的对象属性被修改后，再调用remove()方法时不起作用 ???
             //5.更新roadsPQ
             roadsPQ.remove(nextRoad);
+
             roadsPQ.set(i, road);
             roadsPQ.set(nextroadid, nextRoad);
         }

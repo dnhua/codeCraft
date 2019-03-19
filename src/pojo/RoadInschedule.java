@@ -8,6 +8,9 @@ public class RoadInschedule implements Comparable{
     private Map<String, List<Lane>> lanemap = new HashMap<>();
     private boolean isDone = false;
     private int speedLimit; //限速
+    private int beginId;
+    private int endId;
+    private boolean isBidirectional;
 
     public void updateFirst(CarInschedule car) {
         int i = car.getLaneid();
@@ -36,6 +39,30 @@ public class RoadInschedule implements Comparable{
         cars.removeFirst();
         lanes.get(i).setCars(cars);
         lanemap.put(car.getRoadid()+"->"+car.getNextroadid(), lanes);
+    }
+
+    public int getBeginId() {
+        return beginId;
+    }
+
+    public void setBeginId(int beginId) {
+        this.beginId = beginId;
+    }
+
+    public boolean isBidirectional() {
+        return isBidirectional;
+    }
+
+    public void setBidirectional(boolean bidirectional) {
+        isBidirectional = bidirectional;
+    }
+
+    public int getEndId() {
+        return endId;
+    }
+
+    public void setEndId(int endId) {
+        this.endId = endId;
     }
 
     public int getId() {

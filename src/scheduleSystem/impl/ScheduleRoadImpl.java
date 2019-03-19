@@ -7,10 +7,13 @@ import scheduleSystem.ScheduleRoad;
 import java.util.*;
 
 public class ScheduleRoadImpl implements ScheduleRoad {
+    //key: road id, value: road
     Map<Integer, RoadInschedule> roads = new HashMap<>();
 
     public ScheduleRoadImpl(List<RoadInschedule> roads) {
-
+        for (RoadInschedule road : roads) {
+            this.roads.put(road.getId(), road);
+        }
     }
 
     public ScheduleRoadImpl() {
@@ -73,8 +76,8 @@ public class ScheduleRoadImpl implements ScheduleRoad {
     }
 
     @Override
-    public void updateOneRoad(RoadInschedule road) {
-        List<Lane> lanes = road.getLanes();
+    public void updateOneRoad(RoadInschedule road, String fromTo) {
+        List<Lane> lanes = road.getLanemap().get(fromTo);
         for (Lane lane : lanes) {
             updateOne(lane);
         }
@@ -83,7 +86,8 @@ public class ScheduleRoadImpl implements ScheduleRoad {
     @Override
     public void updateAll() {
         for (Map.Entry<Integer, RoadInschedule> entry : roads.entrySet()) {
-            updateOneRoad(entry.getValue());
+            RoadInschedule road = entry.getValue();
+
         }
     }
 
