@@ -77,10 +77,18 @@ public class ScheduleCrossImpl implements ScheduleCross {
 
     @Override
     public void scheduleOneCross(CrossInschedule crossInschedule) {
+        while (shceduleOneCrossOneRound(crossInschedule));
+    }
+
+    private boolean shceduleOneCrossOneRound(CrossInschedule crossInschedule) {
         List<Integer> roadsIndexPQ = crossInschedule.getRoadIndexPQ();
         List<Integer> roadIds = crossInschedule.getRoadIds();
+        int[] flags = new int[4];
         //对于每条路(按优先级选取)
         for (int i=0; i<roadsIndexPQ.size(); i++) {
+            if (i%4==0) {
+                flags = new int[4];
+            }
             Integer index = roadsIndexPQ.get(i);
             int roadid = roadIds.get(index);
             if (roadid == -1)   //如果此位置没有连接道路
@@ -98,6 +106,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
                 road.updateFirst(car);
                 //更新map roads
                 roads.put(road.getId(), road);
+                flags[index] = 1;   //index这条路动了
                 continue;
             }
             //2.选择车道
@@ -106,6 +115,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
             int ilane = choiceLane(crossInschedule, nextroad);
             if (ilane == -1)
                 continue;
+            flags[index] = 1;   //index这条路动了
             //3.计算在下一个车道可以行进的距离
             int s2 = calcNextRoadMaxDistance(crossInschedule, car);
             //4.更新car，更新road，旧road里面的car要删除，新road添加
@@ -121,7 +131,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
             car.setDistance(nextroad.getLength());
             car.setCanOutCross(false);
             int nextcrossid = (crossInschedule.getId() == nextroad.getBeginId() ?
-                                                        nextroad.getEndId() : nextroad.getBeginId());
+                    nextroad.getEndId() : nextroad.getBeginId());
             car.setFromTo(crossInschedule.getId()+""+nextcrossid);
             //car.setNextroadid();  //当前无法判断需要Schedule和路径规划判断。
             //car.setDirection();   //当前无法判断需要Schedule和路径规划判断。
@@ -136,7 +146,13 @@ public class ScheduleCrossImpl implements ScheduleCross {
             //6. 最后需要更新roads
             roads.put(road.getId(), road);
             roads.put(nextroadid, nextRoad);
+
+            //对每一轮进行判断，如果只要有路动了，就认为这次调度是可以继续的
+            if (i%4==3){
+                return flags[0]==1 || flags[1]==1 || flags[2]==1 || flags[3]==1;
+            }
         }
+        return false;
     }
 
     private int calcNextRoadMaxDistance(CrossInschedule cross, CarInschedule car) {
