@@ -11,6 +11,7 @@ public class RoadInschedule implements Comparable{
     private int beginId;
     private int endId;
     private boolean isBidirectional;
+    private int length;
 
     public void updateFirst(CarInschedule car) {
         int i = car.getLaneid();
@@ -39,6 +40,14 @@ public class RoadInschedule implements Comparable{
         cars.removeFirst();
         lanes.get(i).setCars(cars);
         lanemap.put(car.getRoadid()+"->"+car.getNextroadid(), lanes);
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(int length) {
+        this.length = length;
     }
 
     public int getBeginId() {
