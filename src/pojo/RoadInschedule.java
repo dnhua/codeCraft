@@ -33,6 +33,15 @@ public class RoadInschedule implements Comparable{
         lanemap.put(car.getRoadid()+"->"+car.getNextroadid(), lanes);
     }
 
+    public void addLast(CarInschedule car) {
+        int i = car.getLaneid();
+        List<Lane> lanes = lanemap.get(car.getRoadid()+"->"+car.getNextroadid());
+        Deque<CarInschedule> cars = lanes.get(i).getCars();
+        cars.addLast(car);
+        lanes.get(i).setCars(cars);
+        lanemap.put(car.getRoadid()+"->"+car.getNextroadid(), lanes);
+    }
+
     public void removeFirst(CarInschedule car) {
         int i = car.getLaneid();
         List<Lane> lanes = lanemap.get(car.getRoadid()+"->"+car.getNextroadid());
