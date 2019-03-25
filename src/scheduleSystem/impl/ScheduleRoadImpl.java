@@ -69,6 +69,8 @@ public class ScheduleRoadImpl implements ScheduleRoad {
                 car.setWaitflag(true);
                 car.setLocation(car.getDistance());
                 car.setCanOutCross(true);
+                if (car.getNextroadid() == -1)
+                    car.setDone(true);
             } else {    //否则更新location
                 car.setLocation(car.getLocation()+car.getRealspeed());
                 car.setStopflag(true);

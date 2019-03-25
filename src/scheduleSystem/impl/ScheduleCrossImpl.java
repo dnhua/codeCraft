@@ -25,6 +25,12 @@ public class ScheduleCrossImpl implements ScheduleCross {
         this.roads = roads;
     }
 
+    public ScheduleCrossImpl(Map<Integer, CrossInschedule> crosses, Map<Integer, RoadInschedule> roads) {
+        this.roads = roads;
+        this.crosses = crosses;
+    }
+
+
     public List getRoadIdList(Cross cross) {
         List idlist = new ArrayList();
         idlist.add(cross.getRoadId1());
@@ -54,7 +60,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
      * @param road
      * @return
      */
-    private CarInschedule getCarFromRoad(CrossInschedule cross, RoadInschedule road) {
+    public CarInschedule getCarFromRoad(CrossInschedule cross, RoadInschedule road) {
         List<Lane> lanes = getLanes(cross, road);
         for (Lane lane : lanes) {
             Deque<CarInschedule> cars = lane.getCars();
@@ -66,7 +72,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
         return null;
     }
     
-    private List<Lane> getLanes(CrossInschedule cross, RoadInschedule road) {
+    public List<Lane> getLanes(CrossInschedule cross, RoadInschedule road) {
         int beginId = road.getBeginId();
         int endId = road.getEndId();
         String fromTo = cross.getId() == beginId ? endId + "->" + beginId : beginId + "->" + endId;
@@ -80,7 +86,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
         while (shceduleOneCrossOneRound(crossInschedule));
     }
 
-    private boolean shceduleOneCrossOneRound(CrossInschedule crossInschedule) {
+    public boolean shceduleOneCrossOneRound(CrossInschedule crossInschedule) {
         List<Integer> roadsIndexPQ = crossInschedule.getRoadIndexPQ();
         List<Integer> roadIds = crossInschedule.getRoadIds();
         int[] flags = new int[4];
@@ -155,7 +161,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
         return false;
     }
 
-    private int calcNextRoadMaxDistance(CrossInschedule cross, CarInschedule car) {
+    public int calcNextRoadMaxDistance(CrossInschedule cross, CarInschedule car) {
         //通过car得到下一条路
         int nextroadid = car.getNextroadid();
         RoadInschedule nextroadInschedule = roads.get(nextroadid);
@@ -166,7 +172,8 @@ public class ScheduleCrossImpl implements ScheduleCross {
         return s2;
     }
 
-    private int choiceLane(CrossInschedule cross, RoadInschedule road) {
+    @Override
+    public int choiceLane(CrossInschedule cross, RoadInschedule road) {
         List<Lane> lanes = getLanes(cross, road);
         int i = 0;
         for (; i<lanes.size(); i++) {
@@ -178,7 +185,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
         return -1;
     }
 
-    private boolean isConflicted(CrossInschedule cross, RoadInschedule road, CarInschedule car, int i) {
+    public boolean isConflicted(CrossInschedule cross, RoadInschedule road, CarInschedule car, int i) {
         List roadids = cross.getRoadIds();
         //直行
         if (car.getDirection() == 3)
