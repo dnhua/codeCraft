@@ -131,19 +131,22 @@ public class ReadData {
         return false;
     }
 
-    static public Answer readAnswer (String path) {
+    static public Answer readAnswer (String path, String carpath) {
         Answer answer = new Answer();
         List<Integer> carid = new ArrayList<>();
         List<List<Integer>> pathlist = new ArrayList<>();
         String line;
         FileReader fileReader = FileUtil.getFileReader(path);
         BufferedReader bufferedReader = FileUtil.getBufferedReader(fileReader);
+        List<Car> cars = ReadData.readCar(carpath);
         try {
+            int j = 0;
             while ((line=bufferedReader.readLine())!=null) {
                 String[] info = getInfo(line);
                 List<Integer> p = new ArrayList<>();
                 carid.add(Integer.parseInt(info[0]));
-                for (int i=0; i<info.length; i++) {
+                p.add(cars.get(j++).getBeginId());
+                for (int i=1; i<info.length; i++) {
                     p.add(Integer.parseInt(info[i]));
                 }
                 pathlist.add(p);
