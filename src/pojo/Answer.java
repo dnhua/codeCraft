@@ -28,4 +28,12 @@ public class Answer {
     public void setPathList(List<List<Integer>> pathList) {
         this.pathList = pathList;
     }
+
+    @Override
+    public String toString() {
+        return "Answer{" +
+                "carid=" + carid +
+                ", pathList=" + pathList +
+                '}';
+    }
 }

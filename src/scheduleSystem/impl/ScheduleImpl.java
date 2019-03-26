@@ -18,9 +18,11 @@ public class ScheduleImpl implements Schedule {
     private Map<Integer, CrossInschedule> crosses = new HashMap<>();
     private int N = 0;  //时间片
 
-    public ScheduleImpl(Answer answer) {
+    public ScheduleImpl(Answer answer, Map<Integer, RoadInschedule> roads, Map<Integer, CrossInschedule> crosses) {
         scheduleRoad = new ScheduleRoadImpl(roads);
         scheduleCross = new ScheduleCrossImpl(crosses, roads);
+        this.roads = roads;
+        this.crosses = crosses;
         this.answer = answer;
     }
 
@@ -54,6 +56,7 @@ public class ScheduleImpl implements Schedule {
                 road.addLast(car);
                 //3. 最后需要更新roads
                 roads.put(road.getId(), road);
+
             }
         }
     }
@@ -138,6 +141,8 @@ public class ScheduleImpl implements Schedule {
         int i = 0;
         for (; i<lanes.size(); i++) {
             Deque<CarInschedule> cars = lanes.get(i).getCars();
+            if (cars.size()==0)
+                return i;
             CarInschedule last = cars.getLast();
             if (last.getLocation() > 0)
                 return i;

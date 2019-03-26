@@ -43,7 +43,7 @@ public class ScheduleRoadImpl implements ScheduleRoad {
         road.setLanemap(lanemap);
     }
 
-    private void updateCars(Deque<CarInschedule> cars) {
+    public void updateCars(Deque<CarInschedule> cars) {
         Iterator<CarInschedule> it = cars.iterator();
         CarInschedule car;
         CarInschedule carLast = null;
@@ -61,7 +61,7 @@ public class ScheduleRoadImpl implements ScheduleRoad {
         }
     }
 
-    private void setCarByInfo(CarInschedule car, CarInschedule carLast) {
+    public void setCarByInfo(CarInschedule car, CarInschedule carLast) {
         //判断是否是第一辆车(最靠近下一个路口的车)
         if (carLast==null) {
             //如果此时间片该车到达出路口位置
