@@ -30,4 +30,9 @@ public interface Schedule {
      * 调度一个时间片
      */
     void scheduleOneTimeSlice();
+
+    /**
+     * 调度
+     */
+    void schedule();
 }

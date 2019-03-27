@@ -13,7 +13,7 @@ import java.util.Map;
 public class ScheduleImpl implements Schedule {
     private ScheduleRoad scheduleRoad;
     private ScheduleCross scheduleCross;
-    private Answer answer;
+    public static Answer answer;
     private Map<Integer, RoadInschedule> roads = new HashMap<>();
     private Map<Integer, CrossInschedule> crosses = new HashMap<>();
     private int N = 0;  //时间片
@@ -23,7 +23,7 @@ public class ScheduleImpl implements Schedule {
         scheduleCross = new ScheduleCrossImpl(crosses, roads);
         this.roads = roads;
         this.crosses = crosses;
-        this.answer = answer;
+        ScheduleImpl.answer = answer;
     }
 
     @Override
@@ -40,6 +40,7 @@ public class ScheduleImpl implements Schedule {
                 int s2 = calcNextRoadMaxDistance(pathlist.get(2), car);
                 //2.更新car，更新road
                 RoadInschedule road = roads.get(pathlist.get(2));
+                car.setId(answer.getCarid().get(i));
                 car.setRoadid(pathlist.get(2));
                 car.setLocation(s2);
                 car.setRoadspeedlimit(road.getSpeedLimit());
@@ -50,13 +51,19 @@ public class ScheduleImpl implements Schedule {
                 car.setDistance(road.getLength());
                 car.setCanOutCross(false);
                 int nextcrossid = pathlist.get(0) == road.getBeginId() ? road.getEndId() : road.getBeginId();
-                car.setFromTo(pathlist.get(0)+""+nextcrossid);
+                car.setNextcrossid(nextcrossid);
+                car.setFromTo(pathlist.get(0)+"->"+nextcrossid);
                 car.setNextroadid(pathlist.get(3));  //下条路的id
                 car.setDirection(getDirection(pathlist.get(0), pathlist.get(3), pathlist.get(4)));   //转向
                 road.addLast(car);
                 //3. 最后需要更新roads
                 roads.put(road.getId(), road);
-
+//                try {
+//                    Thread.sleep(100);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+                System.out.println(road);
             }
         }
     }
@@ -162,10 +169,17 @@ public class ScheduleImpl implements Schedule {
 
     @Override
     public void scheduleOneTimeSlice() {
+        choiceNewCarOnTORoad();
+        scheduleCarsOnRoads();
+        scheduleCarsInCross();
+    }
+
+    @Override
+    public void schedule() {
         while (answer.getCarid().size() != 0) {
-            choiceNewCarOnTORoad();
-            scheduleCarsOnRoads();
-            scheduleCarsInCross();
+            scheduleOneTimeSlice();
         }
     }
+
+
 }

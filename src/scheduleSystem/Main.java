@@ -23,7 +23,7 @@ public class Main {
         Map<Integer, RoadInschedule> roads = initRoadsMap(roadlist);
 
         ScheduleImpl schedule = new ScheduleImpl(answer, roads, crosses);
-        schedule.scheduleOneTimeSlice();
+        schedule.schedule();
     }
 
     public Map<Integer, RoadInschedule> initRoadsMap(List<Road> roadlist) {
@@ -42,12 +42,14 @@ public class Main {
             for (int j=0; j<roadlist.get(i).getLaneNums(); j++)
                 lane1.add(new Lane());
             lanemap.put(road.getBeginId()+"->"+road.getEndId(), lane1);
+
             if (road.isBidirectional()) {
                 List<Lane> lane2 = new ArrayList<>();
                 for (int j=0; j<roadlist.get(i).getLaneNums(); j++)
-                    lane1.add(new Lane());
+                    lane2.add(new Lane());
                 lanemap.put(road.getEndId()+"->"+road.getBeginId(), lane2);
             }
+
             road.setLanemap(lanemap);
             roads.put(road.getId(), road);
         }

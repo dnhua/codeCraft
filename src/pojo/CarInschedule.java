@@ -4,6 +4,7 @@ public class CarInschedule {
     private int id;
     private int roadid;
     private int nextroadid;
+    private int nextcrossid;
     private int laneid;
     private int location;
     private boolean waitflag = false;
@@ -129,11 +130,26 @@ public class CarInschedule {
         this.nextroadid = nextroadid;
     }
 
+    public int getNextcrossid() {
+        return nextcrossid;
+    }
+
+    public void setNextcrossid(int nextcrossid) {
+        this.nextcrossid = nextcrossid;
+    }
+
     public boolean isDone() {
         return done;
     }
 
     public void setDone(boolean done) {
         this.done = done;
+    }
+
+    @Override
+    public String toString() {
+        return "CarInschedule{" +
+                "id=" + id +
+                '}';
     }
 }

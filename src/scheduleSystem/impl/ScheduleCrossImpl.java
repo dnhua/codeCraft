@@ -2,13 +2,14 @@ package scheduleSystem.impl;
 
 import pojo.*;
 import scheduleSystem.ScheduleCross;
+import utils.ReadData;
 
 import java.util.*;
 
-public class ScheduleCrossImpl implements ScheduleCross {
-    Map<Integer, RoadInschedule> roads;
-    Map<Integer, CrossInschedule> crosses = new HashMap<>();
 
+public class ScheduleCrossImpl implements ScheduleCross {
+    private Map<Integer, RoadInschedule> roads;
+    private Map<Integer, CrossInschedule> crosses = new HashMap<>();
     public ScheduleCrossImpl(List<Cross> list, Map<Integer, RoadInschedule> roads) {
         this.roads = roads;
         for (Cross cross : list) {
@@ -62,6 +63,11 @@ public class ScheduleCrossImpl implements ScheduleCross {
      */
     public CarInschedule getCarFromRoad(CrossInschedule cross, RoadInschedule road) {
         List<Lane> lanes = getLanes(cross, road);
+        if (lanes == null)
+            return null;
+//        System.out.println(lanes);
+//        System.out.println(cross);
+//        System.out.println(road);
         for (Lane lane : lanes) {
             Deque<CarInschedule> cars = lane.getCars();
             for (CarInschedule car : cars) {
@@ -75,8 +81,17 @@ public class ScheduleCrossImpl implements ScheduleCross {
     public List<Lane> getLanes(CrossInschedule cross, RoadInschedule road) {
         int beginId = road.getBeginId();
         int endId = road.getEndId();
+        //debug:这里没有判断道路是否是双向的
         String fromTo = cross.getId() == beginId ? endId + "->" + beginId : beginId + "->" + endId;
+
+//        System.out.println("cross "+cross.getId());
+//        System.out.println("road "+road.getId());
+//        System.out.println(fromTo);
+
         Map<String, List<Lane>> lanemap = road.getLanemap();
+        if(!lanemap.containsKey(fromTo)) {
+            return null;
+        }
         List<Lane>  lanes = lanemap.get(fromTo);
         return lanes;
     }
@@ -99,6 +114,8 @@ public class ScheduleCrossImpl implements ScheduleCross {
             int roadid = roadIds.get(index);
             if (roadid == -1)   //如果此位置没有连接道路
                 continue;
+//            System.out.println("crossid"+crossInschedule.getId());
+//            System.out.println("roadid"+roadid);
             RoadInschedule road = roads.get(roadid);
             //选择一辆在排队的车
             CarInschedule car = getCarFromRoad(crossInschedule, road);
@@ -127,6 +144,8 @@ public class ScheduleCrossImpl implements ScheduleCross {
             //4.更新car，更新road，旧road里面的car要删除，新road添加
             int oldlaneid = car.getLaneid();    //保存旧的lane的id
             RoadInschedule nextRoad = roads.get(nextroadid);
+            //if (car.getRoadid() == )
+            road.removeFirst(car);   //删除旧road里面的car
             car.setRoadid(nextroadid);
             car.setLocation(s2);
             car.setRoadspeedlimit(nextRoad.getSpeedLimit());
@@ -138,15 +157,33 @@ public class ScheduleCrossImpl implements ScheduleCross {
             car.setCanOutCross(false);
             int nextcrossid = (crossInschedule.getId() == nextroad.getBeginId() ?
                     nextroad.getEndId() : nextroad.getBeginId());
-            car.setFromTo(crossInschedule.getId()+""+nextcrossid);
-            //car.setNextroadid();  //当前无法判断需要Schedule和路径规划判断。
+            car.setFromTo(crossInschedule.getId()+"->"+nextcrossid);
+
+            //debug:这里一定要决定好下一个roadid
+            //这里假设取静态调度的结果
+            List<List<Integer>> pathList = ScheduleImpl.answer.getPathList();
+            List<Integer> carid = ScheduleImpl.answer.getCarid();
+//            System.out.println(pathList.size());
+//            System.out.println(carid.size());
+//            System.out.println(car.getId());
+//            System.out.println(carid.indexOf(car.getId()));
+            List<Integer> path = pathList.get(carid.indexOf(car.getId()));
+//            System.out.println(path.size());
+//            System.out.println(path.indexOf(car.getRoadid()) + 1);
+            Integer nid = path.get(path.indexOf(car.getRoadid()));
+            car.setNextroadid(nid);
+            if (car.getRoadid() == car.getNextroadid()) {
+                car.setDone(true);
+                //carid.remove(car.getId());
+                continue;
+            }
+            //car.setNextroadid(nextroadid);  //当前无法判断需要Schedule和路径规划判断。
             //car.setDirection();   //当前无法判断需要Schedule和路径规划判断。
-            road.removeFirst(car);   //删除旧road里面的car
             nextRoad.updateLast(car);
             //5. 需要调度/更新一下该lane
             ScheduleRoadImpl scheduleRoad = new ScheduleRoadImpl(this.roads);
             int lastcorssid = (crossInschedule.getId() == road.getBeginId() ? road.getEndId():road.getBeginId());
-            scheduleRoad.updateOne(road, oldlaneid, lastcorssid+""+crossInschedule.getId());
+            scheduleRoad.updateOne(road, oldlaneid, lastcorssid+"->"+crossInschedule.getId());
             nextRoad.updateLast(car);
 
             //6. 最后需要更新roads
@@ -175,9 +212,13 @@ public class ScheduleCrossImpl implements ScheduleCross {
     @Override
     public int choiceLane(CrossInschedule cross, RoadInschedule road) {
         List<Lane> lanes = getLanes(cross, road);
+        if (lanes == null)
+            return -1;
         int i = 0;
         for (; i<lanes.size(); i++) {
             Deque<CarInschedule> cars = lanes.get(i).getCars();
+            if (cars == null || cars.size()==0)
+                return i;
             CarInschedule last = cars.getLast();
             if (last.getLocation() > 0)
                 return i;
@@ -186,7 +227,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
     }
 
     public boolean isConflicted(CrossInschedule cross, RoadInschedule road, CarInschedule car, int i) {
-        List roadids = cross.getRoadIds();
+        List<Integer> roadids = cross.getRoadIds();
         //直行
         if (car.getDirection() == 3)
             return false;
@@ -194,24 +235,41 @@ public class ScheduleCrossImpl implements ScheduleCross {
         //左转
         if (car.getDirection() == 2){
             //直行冲突检查
-            if (i == 0)
+            if (i == 0) {
+                if (roadids.get(i+3) == -1)
+                    return false;
                 car1 = getCarFromRoad(cross, roads.get(roadids.get(i+3)));
-            else
+            } else {
+                if (roadids.get(i-1) == -1)
+                    return false;
                 car1 = getCarFromRoad(cross, roads.get(roadids.get(i-1)));
-            return  car!=null && car1.getDirection()==3;
+            }
+            return  car1!=null && car1.getDirection()==3;
         } else {    //右转
             //直行冲突检查
-            if (i == 4)
+            if (i == 3) {
+                if (roadids.get(0) == -1)
+                    return false;
                 car1 = getCarFromRoad(cross, roads.get(roadids.get(0)));
-            else
+            } else {
+                if (roadids.get(i+1) == -1)
+                    return false;
                 car1 = getCarFromRoad(cross, roads.get(roadids.get(i+1)));
+            }
             //左行冲突检查
-            if (i == 0 || i == 1)
+            if (i == 0 || i == 1) {
+                if (roadids.get(i+2) == -1)
+                    return false;
                 car1 = getCarFromRoad(cross, roads.get(roadids.get(i+2)));
-            else if (i == 2)
+            } else if (i == 2) {
+                if (roadids.get(0) == -1)
+                    return false;
                 car1 = getCarFromRoad(cross, roads.get(roadids.get(0)));
-            else if (i==3)
+            } else if (i==3) {
+                if (roadids.get(1) == -1)
+                    return false;
                 car1 = getCarFromRoad(cross, roads.get(roadids.get(1)));
+            }
             return (car1 != null && car1.getDirection() == 2) || (car1 != null && car1.getDirection() == 3);
         }
     }

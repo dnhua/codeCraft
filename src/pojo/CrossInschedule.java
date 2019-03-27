@@ -42,4 +42,11 @@ public class CrossInschedule implements Comparable {
             return 1;
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return "CrossInschedule{" +
+                "id=" + id +
+                '}';
+    }
 }

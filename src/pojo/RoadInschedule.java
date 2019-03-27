@@ -15,40 +15,46 @@ public class RoadInschedule implements Comparable{
 
     public void updateFirst(CarInschedule car) {
         int i = car.getLaneid();
-        List<Lane> lanes = lanemap.get(car.getRoadid()+"->"+car.getNextroadid());
+        List<Lane> lanes = lanemap.get(car.getFromTo());
         Deque<CarInschedule> cars = lanes.get(i).getCars();
-        cars.removeFirst();
+        if (cars!=null && cars.size()>0)
+            cars.removeFirst();
         cars.addFirst(car);
         lanes.get(i).setCars(cars);
-        lanemap.put(car.getRoadid()+"->"+car.getNextroadid(), lanes);
+        lanemap.put(car.getFromTo(), lanes);
     }
 
     public void updateLast(CarInschedule car) {
         int i = car.getLaneid();
-        List<Lane> lanes = lanemap.get(car.getRoadid()+"->"+car.getNextroadid());
+        List<Lane> lanes = lanemap.get(car.getFromTo());
         Deque<CarInschedule> cars = lanes.get(i).getCars();
-        cars.removeLast();
+        if (cars != null && cars.size() > 0)
+            cars.removeLast();
         cars.addLast(car);
         lanes.get(i).setCars(cars);
-        lanemap.put(car.getRoadid()+"->"+car.getNextroadid(), lanes);
+        lanemap.put(car.getFromTo(), lanes);
     }
 
     public void addLast(CarInschedule car) {
         int i = car.getLaneid();
-        List<Lane> lanes = lanemap.get(car.getRoadid()+"->"+car.getNextroadid());
+        //bug解决更新:这里不应该是roadid，应是crossid
+        String fromTo = car.getFromTo();
+        List<Lane> lanes = lanemap.get(fromTo);
         Deque<CarInschedule> cars = lanes.get(i).getCars();
         cars.addLast(car);
         lanes.get(i).setCars(cars);
-        lanemap.put(car.getRoadid()+"->"+car.getNextroadid(), lanes);
+        lanemap.put(car.getFromTo(), lanes);
     }
 
     public void removeFirst(CarInschedule car) {
         int i = car.getLaneid();
-        List<Lane> lanes = lanemap.get(car.getRoadid()+"->"+car.getNextroadid());
+        List<Lane> lanes = lanemap.get(car.getFromTo());
         Deque<CarInschedule> cars = lanes.get(i).getCars();
-        cars.removeFirst();
+
+        if (cars != null && cars.size() > 0)
+            cars.removeFirst();
         lanes.get(i).setCars(cars);
-        lanemap.put(car.getRoadid()+"->"+car.getNextroadid(), lanes);
+        lanemap.put(car.getFromTo(), lanes);
     }
 
     public int getLength() {
@@ -124,5 +130,13 @@ public class RoadInschedule implements Comparable{
             return 1;
         else
             return 0;
+    }
+
+    @Override
+    public String toString() {
+        return "RoadInschedule{" +
+                "id=" + id +
+                ", lanemap=" + lanemap +
+                '}';
     }
 }
