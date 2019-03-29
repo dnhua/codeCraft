@@ -13,7 +13,7 @@ public class Main {
     public void test1() {
         //1.读取answer.txt文件
         Answer answer = ReadData.readAnswer("data/answer.txt", "data/car.txt");
-        System.out.println(answer.getPathList());
+//        System.out.println(answer.getPathList());
         //2.读取roads，cars
         List<Car> carlist = ReadData.readCar("data/car.txt");
         List<Cross> crosslist = ReadData.readCross("data/cross.txt");
@@ -22,7 +22,7 @@ public class Main {
         Map<Integer, CrossInschedule> crosses = initCrossesMap(crosslist);
         Map<Integer, RoadInschedule> roads = initRoadsMap(roadlist);
 
-        ScheduleImpl schedule = new ScheduleImpl(answer, roads, crosses);
+        ScheduleImpl schedule = new ScheduleImpl(answer, roads, crosses, carlist);
         schedule.schedule();
     }
 

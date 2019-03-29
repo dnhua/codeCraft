@@ -4,6 +4,7 @@ import pojo.*;
 import scheduleSystem.Schedule;
 import scheduleSystem.ScheduleCross;
 import scheduleSystem.ScheduleRoad;
+import utils.ReadData;
 
 import java.util.Deque;
 import java.util.HashMap;
@@ -16,11 +17,13 @@ public class ScheduleImpl implements Schedule {
     public static Answer answer;
     private Map<Integer, RoadInschedule> roads = new HashMap<>();
     private Map<Integer, CrossInschedule> crosses = new HashMap<>();
-    private int N = 0;  //时间片
+    public static int N = 0;  //时间片
+    private List<Car> carList;
 
-    public ScheduleImpl(Answer answer, Map<Integer, RoadInschedule> roads, Map<Integer, CrossInschedule> crosses) {
+    public ScheduleImpl(Answer answer, Map<Integer, RoadInschedule> roads, Map<Integer, CrossInschedule> crosses, List<Car> carlist) {
         scheduleRoad = new ScheduleRoadImpl(roads);
         scheduleCross = new ScheduleCrossImpl(crosses, roads);
+        this.carList = carlist;
         this.roads = roads;
         this.crosses = crosses;
         ScheduleImpl.answer = answer;
@@ -31,39 +34,49 @@ public class ScheduleImpl implements Schedule {
         //对于list里面的每一辆车，判断是否可以上路
         for (int i=0; i<answer.getCarid().size(); i++) {
             List<Integer> pathlist = answer.getPathList().get(i);
-            if (pathlist.get(1) < N)
+            if (pathlist.get(1) > N)
                 continue;
+            Map<Integer, Integer> onboadmap = answer.getOnroad();
+            if (onboadmap != null && onboadmap.size() > 0)
+                if (onboadmap.containsKey(answer.getCarid().get(i)) && onboadmap.get(answer.getCarid().get(i)) == 1)
+                    continue;
             if (choiceLane(pathlist.get(0), pathlist.get(2)) != -1) {
                 int laneid = choiceLane(pathlist.get(0), pathlist.get(2));
                 CarInschedule car = new CarInschedule();
                 //1.计算在下一个车道可以行进的距离
-                int s2 = calcNextRoadMaxDistance(pathlist.get(2), car);
+                int s2 = 0;
                 //2.更新car，更新road
                 RoadInschedule road = roads.get(pathlist.get(2));
                 car.setId(answer.getCarid().get(i));
                 car.setRoadid(pathlist.get(2));
-                car.setLocation(s2);
                 car.setRoadspeedlimit(road.getSpeedLimit());
-                car.setRealspeed(Math.min(car.getRoadspeedlimit(), car.getRoadspeedlimit()));
+                car.setDestination(pathlist.get(pathlist.size()-1));
+                //debug：这里的car speed设置有问题
+                int carindexincarlist = i;
+                car.setSpeedlimit(carList.get(carindexincarlist).getSpeedLimit());
+                car.setRealspeed(Math.min(car.getSpeedlimit(), car.getRoadspeedlimit()));
                 car.setLaneid(laneid);
                 car.setWaitflag(false);
                 car.setStopflag(true);
                 car.setDistance(road.getLength());
+                s2 = calcNextRoadMaxDistance(pathlist.get(2), car);
+                car.setLocation(s2);
                 car.setCanOutCross(false);
                 int nextcrossid = pathlist.get(0) == road.getBeginId() ? road.getEndId() : road.getBeginId();
                 car.setNextcrossid(nextcrossid);
                 car.setFromTo(pathlist.get(0)+"->"+nextcrossid);
                 car.setNextroadid(pathlist.get(3));  //下条路的id
-                car.setDirection(getDirection(pathlist.get(0), pathlist.get(3), pathlist.get(4)));   //转向
+                int direction = getDirection(pathlist.get(0), pathlist.get(2), pathlist.get(3));
+                car.setDirection(direction);   //转向
                 road.addLast(car);
                 //3. 最后需要更新roads
                 roads.put(road.getId(), road);
-//                try {
-//                    Thread.sleep(100);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-                System.out.println(road);
+                //4.将answer的这辆车标记为已经上路
+                answer.getOnroad().put(car.getId(), 1);
+//                System.out.println("N: "+N);
+                //System.out.println(answer.getCarid().size());
+//                System.out.println(car.getId());
+//                System.out.println(road);
             }
         }
     }
@@ -127,9 +140,9 @@ public class ScheduleImpl implements Schedule {
         int nextroadid = roadid;
         RoadInschedule nextroadInschedule = roads.get(nextroadid);
         int nextspeedLimit = nextroadInschedule.getSpeedLimit();
-        int v2 = Math.min(car.getSpeedlimit(), nextspeedLimit);
+        int v2 = Math.min(car.getRealspeed(), nextspeedLimit);
         int s1 = car.getDistance() - car.getLocation();
-        int s2 = v2 > s1 ? v2 - s1 : 0;
+        int s2 = v2 > s1 ? v2 : s1-v2;
         return s2;
     }
 
@@ -177,9 +190,11 @@ public class ScheduleImpl implements Schedule {
     @Override
     public void schedule() {
         while (answer.getCarid().size() != 0) {
+//            System.out.println(N);
             scheduleOneTimeSlice();
+//            System.out.println(answer.getCarid().size());
+            N++;
         }
     }
-
 
 }

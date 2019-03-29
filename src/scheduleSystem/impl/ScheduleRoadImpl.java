@@ -32,7 +32,10 @@ public class ScheduleRoadImpl implements ScheduleRoad {
     }
 
     public void updateOne(RoadInschedule road, int laneid, String fromTo) {
-        Deque<CarInschedule> cars = road.getLanemap().get(fromTo).get(laneid).getCars();
+        Map<String, List<Lane>> lanemap1 = road.getLanemap();
+        List<Lane> lanes1 = lanemap1.get(fromTo);
+        Lane lane1 = lanes1.get(laneid);
+        Deque<CarInschedule> cars = lane1.getCars();
         updateCars(cars);
         Map<String, List<Lane>> lanemap = road.getLanemap();
         Lane lane = new Lane();
