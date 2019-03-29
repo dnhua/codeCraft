@@ -4,7 +4,6 @@ import pojo.*;
 import scheduleSystem.Schedule;
 import scheduleSystem.ScheduleCross;
 import scheduleSystem.ScheduleRoad;
-import utils.ReadData;
 
 import java.util.Deque;
 import java.util.HashMap;
@@ -55,6 +54,7 @@ public class ScheduleImpl implements Schedule {
                 int carindexincarlist = i;
                 car.setSpeedlimit(carList.get(carindexincarlist).getSpeedLimit());
                 car.setRealspeed(Math.min(car.getSpeedlimit(), car.getRoadspeedlimit()));
+
                 car.setLaneid(laneid);
                 car.setWaitflag(false);
                 car.setStopflag(true);
@@ -68,13 +68,14 @@ public class ScheduleImpl implements Schedule {
                 car.setNextroadid(pathlist.get(3));  //下条路的id
                 int direction = getDirection(pathlist.get(0), pathlist.get(2), pathlist.get(3));
                 car.setDirection(direction);   //转向
+                //System.out.println(direction+"dir");
                 road.addLast(car);
                 //3. 最后需要更新roads
                 roads.put(road.getId(), road);
                 //4.将answer的这辆车标记为已经上路
                 answer.getOnroad().put(car.getId(), 1);
 //                System.out.println("N: "+N);
-                //System.out.println(answer.getCarid().size());
+//                System.out.println(answer.getCarid().size());
 //                System.out.println(car.getId());
 //                System.out.println(road);
             }
@@ -182,18 +183,21 @@ public class ScheduleImpl implements Schedule {
 
     @Override
     public void scheduleOneTimeSlice() {
+        System.out.println("1.begin choice car");
         choiceNewCarOnTORoad();
+        System.out.println("2.begin schedule car on road");
         scheduleCarsOnRoads();
+        System.out.println("3.begin schedule car in crosses");
         scheduleCarsInCross();
+
     }
 
     @Override
     public void schedule() {
         while (answer.getCarid().size() != 0) {
-//            System.out.println(N);
             scheduleOneTimeSlice();
-//            System.out.println(answer.getCarid().size());
             N++;
+            //System.out.println(N);
         }
     }
 

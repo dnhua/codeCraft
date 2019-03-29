@@ -25,6 +25,16 @@ public class RoadInschedule implements Comparable{
         return true;
     }
 
+    public boolean isempty(String fromTo) {
+        List<Lane> lanes = lanemap.get(fromTo);
+        for (Lane lane : lanes) {
+            Deque<CarInschedule> cars = lane.getCars();
+            if (cars==null || cars.size() == 0)
+                return true;
+        }
+        return true;
+    }
+
     public void updateFirst(CarInschedule car) {
         int i = car.getLaneid();
         List<Lane> lanes = lanemap.get(car.getFromTo());
@@ -52,7 +62,8 @@ public class RoadInschedule implements Comparable{
         //bug解决更新:这里不应该是roadid，应是crossid
         String fromTo = car.getFromTo();
         List<Lane> lanes = lanemap.get(fromTo);
-        //System.out.println(lanes);
+//        System.out.println("fromTo:"+fromTo);
+//        System.out.println("lanemap:"+lanemap);
         Deque<CarInschedule> cars = lanes.get(i).getCars();
         cars.addLast(car);
         lanes.get(i).setCars(cars);

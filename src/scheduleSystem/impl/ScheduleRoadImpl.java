@@ -82,6 +82,11 @@ public class ScheduleRoadImpl implements ScheduleRoad {
             }
         } else {
             int s = carLast.getLocation() - car.getLocation();
+            if (s<0)
+                s=-s;
+            if (s==0)
+                s=1;
+//            System.out.println("s:"+s);
             //如果前面一辆车处于等待状态
             if (carLast.isWaitflag()) {
                 car.setWaitflag(true);  //更新状态

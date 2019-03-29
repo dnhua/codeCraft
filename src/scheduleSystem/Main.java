@@ -12,7 +12,7 @@ public class Main {
     @Test
     public void test1() {
         //1.读取answer.txt文件
-        Answer answer = ReadData.readAnswer("data/answer.txt", "data/car.txt");
+        Answer answer = ReadData.readAnswer("data/answer2.txt", "data/car.txt");
 //        System.out.println(answer.getPathList());
         //2.读取roads，cars
         List<Car> carlist = ReadData.readCar("data/car.txt");
@@ -24,6 +24,8 @@ public class Main {
 
         ScheduleImpl schedule = new ScheduleImpl(answer, roads, crosses, carlist);
         schedule.schedule();
+        System.out.println(ScheduleImpl.answer.getCarid().size());
+        System.out.println(ScheduleImpl.N);
     }
 
     public Map<Integer, RoadInschedule> initRoadsMap(List<Road> roadlist) {
