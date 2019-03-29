@@ -13,6 +13,18 @@ public class RoadInschedule implements Comparable{
     private boolean isBidirectional;
     private int length;
 
+    public boolean isfull(String fromTo) {
+        List<Lane> lanes = lanemap.get(fromTo);
+        for (Lane lane : lanes) {
+            Deque<CarInschedule> cars = lane.getCars();
+            if (cars==null || cars.size() == 0)
+                return false;
+            if (cars.getLast().getLocation() != 0)
+                return false;
+        }
+        return true;
+    }
+
     public void updateFirst(CarInschedule car) {
         int i = car.getLaneid();
         List<Lane> lanes = lanemap.get(car.getFromTo());
@@ -40,6 +52,7 @@ public class RoadInschedule implements Comparable{
         //bug解决更新:这里不应该是roadid，应是crossid
         String fromTo = car.getFromTo();
         List<Lane> lanes = lanemap.get(fromTo);
+        //System.out.println(lanes);
         Deque<CarInschedule> cars = lanes.get(i).getCars();
         cars.addLast(car);
         lanes.get(i).setCars(cars);

@@ -1,5 +1,7 @@
 package pojo;
 
+import java.util.Objects;
+
 public class CarInschedule {
     private int id;
     private int roadid;
@@ -17,7 +19,7 @@ public class CarInschedule {
     private String fromTo;
     private boolean done = false;   //是否到达目的地
     private int direction = 3;  //3直行，2是左转，1是右转。默认直行，在每次变为等待状态时应该更新方向。
-
+    private int destination;
     public String getFromTo() {
         return fromTo;
     }
@@ -130,6 +132,14 @@ public class CarInschedule {
         this.nextroadid = nextroadid;
     }
 
+    public int getDestination() {
+        return destination;
+    }
+
+    public void setDestination(int destination) {
+        this.destination = destination;
+    }
+
     public int getNextcrossid() {
         return nextcrossid;
     }
@@ -145,6 +155,7 @@ public class CarInschedule {
     public void setDone(boolean done) {
         this.done = done;
     }
+
 
     @Override
     public String toString() {
