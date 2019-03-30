@@ -122,6 +122,7 @@ public class ScheduleRoadImpl implements ScheduleRoad {
             if (road.isBidirectional())
                 updateOneRoad(road, road.getEndId()+"->"+road.getBeginId());
         }
+        ScheduleImpl.N++;
     }
 
     @Override

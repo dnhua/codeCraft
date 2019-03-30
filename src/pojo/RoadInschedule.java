@@ -15,11 +15,25 @@ public class RoadInschedule implements Comparable{
 
     public boolean isfull(String fromTo) {
         List<Lane> lanes = lanemap.get(fromTo);
+        if (lanes==null)
+            return false;
         for (Lane lane : lanes) {
             Deque<CarInschedule> cars = lane.getCars();
             if (cars==null || cars.size() == 0)
                 return false;
             if (cars.getLast().getLocation() != 0)
+                return false;
+        }
+        return true;
+    }
+
+    public boolean isfullByratio(String fromTo, double ratio) {
+        List<Lane> lanes = lanemap.get(fromTo);
+        for (Lane lane : lanes) {
+            Deque<CarInschedule> cars = lane.getCars();
+            if (cars==null || cars.size() == 0)
+                return false;
+            if (cars.getLast().getLocation() > this.getLength() * ratio)
                 return false;
         }
         return true;
@@ -64,6 +78,8 @@ public class RoadInschedule implements Comparable{
         List<Lane> lanes = lanemap.get(fromTo);
 //        System.out.println("fromTo:"+fromTo);
 //        System.out.println("lanemap:"+lanemap);
+        if (lanes==null)
+            return;
         Deque<CarInschedule> cars = lanes.get(i).getCars();
         cars.addLast(car);
         lanes.get(i).setCars(cars);

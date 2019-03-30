@@ -109,7 +109,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
     }
 
     public boolean shceduleOneCrossOneRound(CrossInschedule crossInschedule) {
-        System.out.println("3.1开始调度"+crossInschedule.getId()+"路口");
+//        System.out.println("3.1开始调度"+crossInschedule.getId()+"路口");
         List<Integer> roadsIndexPQ = crossInschedule.getRoadIndexPQ();
         List<Integer> roadIds = crossInschedule.getRoadIds();
         int[] flags = new int[4];
@@ -122,7 +122,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
             int roadid = roadIds.get(index);
             if (roadid == -1)   //如果此位置没有连接道路
                 continue;
-            System.out.println("3.2选取的路为:"+roadid);
+//            System.out.println("3.2选取的路为:"+roadid);
             //选择一辆在排队的车
             RoadInschedule road = roads.get(roadid);
             CarInschedule car = getCarFromRoad(crossInschedule, road);
@@ -133,7 +133,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
                 car = getCarFromRoad(crossInschedule, road);
                 if (car==null || isConflicted(crossInschedule, car, i))
                     break;
-                System.out.println("选取的车为:"+car.getId());
+//                System.out.println("选取的车为:"+car.getId());
 
                 //1.判断该车是否可以通过下一个车道
                 if (!car.isCanOutCross()) {
@@ -149,7 +149,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
                                         +"  car的限速"+car.getSpeedlimit()+"  road的限速 "+car.getRoadspeedlimit());
                     continue;
                 }
-                System.out.println("该车可以通过");
+//                System.out.println("该车可以通过");
                 //2.判断此车是否到达目的地
                 List<List<Integer>> pathList = ScheduleImpl.answer.getPathList();
                 List<Integer> carid = ScheduleImpl.answer.getCarid();
@@ -202,6 +202,7 @@ public class ScheduleCrossImpl implements ScheduleCross {
                 //计算下一个cross的id
                 int nextcrossid = (crossInschedule.getId() == newroad.getBeginId() ?
                         newroad.getEndId() : newroad.getBeginId());
+                String oldFromTo = car.getFromTo();
                 car.setFromTo(crossInschedule.getId()+"->"+nextcrossid);
                 int direction = getDirection(car.getRoadid(), car.getNextroadid(), crossInschedule);
                 car.setDirection(direction);
@@ -246,6 +247,8 @@ public class ScheduleCrossImpl implements ScheduleCross {
     public int getS2(int s, RoadInschedule road, String fromTo, int ilane) {
         Map<String, List<Lane>> lanemap = road.getLanemap();
         List<Lane> lanes = lanemap.get(fromTo);
+        if(lanes==null)
+            return s;
         Lane lane = lanes.get(ilane);
         Deque<CarInschedule> cars = lane.getCars();
         if(cars!=null && cars.size()!=0) {

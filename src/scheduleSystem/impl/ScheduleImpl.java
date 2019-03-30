@@ -1,6 +1,7 @@
 package scheduleSystem.impl;
 
 import pojo.*;
+import scheduleSystem.Main;
 import scheduleSystem.Schedule;
 import scheduleSystem.ScheduleCross;
 import scheduleSystem.ScheduleRoad;
@@ -28,6 +29,40 @@ public class ScheduleImpl implements Schedule {
         ScheduleImpl.answer = answer;
     }
 
+    public boolean isAnyFull(int carid, double ratio) {
+        int index = answer.getCarid().indexOf(carid);
+        List<Integer> pathList = answer.getPathList().get(index);
+        //依次判断每条路是否满了
+        boolean isfull = false;
+        for (int i=2; i<pathList.size(); i++) {
+            String fromTo = null;
+            if (i<pathList.size()-1) {
+                Integer roadid1 = pathList.get(i);
+                Integer roadid2 = pathList.get(i + 1);
+                RoadInschedule road1 = roads.get(roadid1);
+                RoadInschedule road2 = roads.get(roadid2);
+                Map<String, List<Lane>> lanemap = road1.getLanemap();
+                if (road1.getBeginId()==road2.getBeginId() || road1.getBeginId()==road2.getEndId())
+                    fromTo = road1.getEndId()+"->"+road1.getBeginId();
+                else if (road1.getEndId()==road2.getBeginId() || road1.getEndId()==road2.getEndId())
+                    fromTo = road1.getBeginId()+"->"+road1.getEndId();
+                isfull = road1.isfull(fromTo);
+            } else {
+                Integer roadid0 = pathList.get(i-1);
+                Integer roadid1 = pathList.get(i);
+                RoadInschedule road0 = roads.get(roadid0);
+                RoadInschedule road1 = roads.get(roadid1);
+                Map<String, List<Lane>> lanemap = road1.getLanemap();
+                if (road1.getBeginId()==road0.getBeginId() || road1.getBeginId()==road0.getEndId())
+                    fromTo = road1.getBeginId()+"->"+road1.getEndId();
+                else if (road1.getEndId()==road0.getBeginId() || road1.getEndId()==road0.getEndId())
+                    fromTo = fromTo = road1.getEndId()+"->"+road1.getBeginId();
+                isfull = road1.isfullByratio(fromTo, ratio);
+            }
+        }
+        return isfull;
+    }
+
     @Override
     public void choiceNewCarOnTORoad() {
         //对于list里面的每一辆车，判断是否可以上路
@@ -35,6 +70,12 @@ public class ScheduleImpl implements Schedule {
             List<Integer> pathlist = answer.getPathList().get(i);
             if (pathlist.get(1) > N)
                 continue;
+            if (pathlist.get(1) < N  && isAnyFull(answer.getCarid().get(i), 0.75)) {
+                List<Integer> integers = Main.answersubmit.getPathList().get(i);
+                integers.set(1,pathlist.get(1)+10);
+                pathlist.set(1, pathlist.get(1)+10);
+                continue;
+            }
             Map<Integer, Integer> onboadmap = answer.getOnroad();
             if (onboadmap != null && onboadmap.size() > 0)
                 if (onboadmap.containsKey(answer.getCarid().get(i)) && onboadmap.get(answer.getCarid().get(i)) == 1)
@@ -74,10 +115,6 @@ public class ScheduleImpl implements Schedule {
                 roads.put(road.getId(), road);
                 //4.将answer的这辆车标记为已经上路
                 answer.getOnroad().put(car.getId(), 1);
-//                System.out.println("N: "+N);
-//                System.out.println(answer.getCarid().size());
-//                System.out.println(car.getId());
-//                System.out.println(road);
             }
         }
     }
@@ -183,11 +220,11 @@ public class ScheduleImpl implements Schedule {
 
     @Override
     public void scheduleOneTimeSlice() {
-        System.out.println("1.begin choice car");
+//        System.out.println("1.begin choice car");
         choiceNewCarOnTORoad();
-        System.out.println("2.begin schedule car on road");
+//        System.out.println("2.begin schedule car on road");
         scheduleCarsOnRoads();
-        System.out.println("3.begin schedule car in crosses");
+//        System.out.println("3.begin schedule car in crosses");
         scheduleCarsInCross();
 
     }
@@ -196,7 +233,6 @@ public class ScheduleImpl implements Schedule {
     public void schedule() {
         while (answer.getCarid().size() != 0) {
             scheduleOneTimeSlice();
-            N++;
             //System.out.println(N);
         }
     }

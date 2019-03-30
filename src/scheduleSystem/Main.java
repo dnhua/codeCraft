@@ -3,21 +3,27 @@ package scheduleSystem;
 import org.junit.jupiter.api.Test;
 import pojo.*;
 import scheduleSystem.impl.ScheduleImpl;
+import utils.FileUtil;
 import utils.ReadData;
 
 import java.util.*;
 
 public class Main {
-
+    static public Answer answersubmit = ReadData.readAnswer("data/exam/answer.txt", "data/exam/car.txt");
     @Test
     public void test1() {
         //1.读取answer.txt文件
-        Answer answer = ReadData.readAnswer("data/answer2.txt", "data/car.txt");
+        Answer answer1 = ReadData.readAnswer("data/exam/answer.txt", "data/exam/car.txt");
+//        System.out.println(answer1.getPathList().get(0));
 //        System.out.println(answer.getPathList());
         //2.读取roads，cars
-        List<Car> carlist = ReadData.readCar("data/car.txt");
-        List<Cross> crosslist = ReadData.readCross("data/cross.txt");
-        List<Road> roadlist = ReadData.readRoad("data/road.txt");
+        List<Car> carlist = ReadData.readCar("data/exam/car.txt");
+        List<Cross> crosslist = ReadData.readCross("data/exam/cross.txt");
+        List<Road> roadlist = ReadData.readRoad("data/exam/road.txt");
+        Answer answer = makeAnswerInorder(answer1, carlist);
+//        Answer answer = answer1;
+        System.out.println("answer 准备完毕！");
+//        System.out.println(answer.getPathList());
         //2.准备roads，crosses
         Map<Integer, CrossInschedule> crosses = initCrossesMap(crosslist);
         Map<Integer, RoadInschedule> roads = initRoadsMap(roadlist);
@@ -26,6 +32,28 @@ public class Main {
         schedule.schedule();
         System.out.println(ScheduleImpl.answer.getCarid().size());
         System.out.println(ScheduleImpl.N);
+        FileUtil.ListAnswer2txt(Main.answersubmit,"data/answer/answer.txt");
+    }
+
+    public Answer makeAnswerInorder(Answer answerold, List<Car> carlist) {
+        Answer answer = new Answer();
+        List<List<Integer>> pathlist = new ArrayList<>();
+        List<Integer> caridlist = new ArrayList<>();
+        for (int i=0; i<carlist.size(); i++) {
+            int j=0;
+            for (j=0; j<answerold.getCarid().size(); j++) {
+                if (carlist.get(i).getId() == answerold.getCarid().get(j)) {
+                    break;
+                }
+            }
+            caridlist.add(answerold.getCarid().get(j));
+            pathlist.add(answerold.getPathList().get(j));
+            System.out.println(answerold.getCarid().get(j));
+            System.out.println(answerold.getPathList().get(j));
+        }
+        answer.setPathList(pathlist);
+        answer.setCarid(caridlist);
+        return answer;
     }
 
     public Map<Integer, RoadInschedule> initRoadsMap(List<Road> roadlist) {

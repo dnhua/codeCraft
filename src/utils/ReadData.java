@@ -140,12 +140,15 @@ public class ReadData {
         BufferedReader bufferedReader = FileUtil.getBufferedReader(fileReader);
         List<Car> cars = ReadData.readCar(carpath);
         try {
-            int j = 0;
             while ((line=bufferedReader.readLine())!=null) {
                 String[] info = getInfo(line);
                 List<Integer> p = new ArrayList<>();
                 carid.add(Integer.parseInt(info[0]));
-                p.add(cars.get(j++).getBeginId());
+                int i1 = Integer.parseInt(info[0]);
+                Car carnew = new Car();
+                carnew.setId(i1);
+                int carindex = cars.indexOf(carnew);
+                p.add(cars.get(carindex).getBeginId());
                 for (int i=1; i<info.length; i++) {
                     p.add(Integer.parseInt(info[i]));
                 }
