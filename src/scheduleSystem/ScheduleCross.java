@@ -9,7 +9,7 @@ public interface ScheduleCross {
      */
     void scheduleOneCross(CrossInschedule crossInschedule);
     /**
-     * 调度所有的路口
+     * 调度 所有的路口
      */
     void scheduleAllCross();
 
