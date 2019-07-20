@@ -1,4 +1,5 @@
 package utils;
+import pojo.Answer;
 import pojo.Car;
 import pojo.Cross;
 import pojo.Road;
@@ -128,5 +129,40 @@ public class ReadData {
             return true;
         }
         return false;
+    }
+
+    static public Answer readAnswer (String path, String carpath) {
+        Answer answer = new Answer();
+        List<Integer> carid = new ArrayList<>();
+        List<List<Integer>> pathlist = new ArrayList<>();
+        String line;
+        FileReader fileReader = FileUtil.getFileReader(path);
+        BufferedReader bufferedReader = FileUtil.getBufferedReader(fileReader);
+        List<Car> cars = ReadData.readCar(carpath);
+        try {
+            while ((line=bufferedReader.readLine())!=null) {
+                String[] info = getInfo(line);
+                List<Integer> p = new ArrayList<>();
+                carid.add(Integer.parseInt(info[0]));
+                int i1 = Integer.parseInt(info[0]);
+                Car carnew = new Car();
+                carnew.setId(i1);
+                int carindex = cars.indexOf(carnew);
+                p.add(cars.get(carindex).getBeginId());
+                for (int i=1; i<info.length; i++) {
+                    p.add(Integer.parseInt(info[i]));
+                }
+                pathlist.add(p);
+            }
+            answer.setCarid(carid);
+            answer.setPathList(pathlist);
+            return answer;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            //关闭资源
+            FileUtil.closeBufferedReader(bufferedReader);
+        }
+        return answer;
     }
 }

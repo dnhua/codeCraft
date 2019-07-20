@@ -31,4 +31,12 @@ public class Lane {
     public void setCars(Deque<CarInschedule> cars) {
         this.cars = cars;
     }
+
+    @Override
+    public String toString() {
+        return "Lane{" +
+                "cars=" + cars +
+                ", isDone=" + isDone +
+                '}';
+    }
 }

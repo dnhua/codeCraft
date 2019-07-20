@@ -6,7 +6,6 @@ import pojo.Cross;
 import pojo.Road;
 import utils.ReadData;
 
-import java.io.IOException;
 import java.util.List;
 
 public class TestUtils {

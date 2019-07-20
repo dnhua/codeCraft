@@ -1,5 +1,7 @@
 package pojo;
 
+import java.util.Objects;
+
 public class Car {
     private int id;    //id
     private int beginId;    //始发地
@@ -46,6 +48,18 @@ public class Car {
 
     public void setDepartTime(int departTime) {
         this.departTime = departTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        Car car = (Car) o;
+        return id == car.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override

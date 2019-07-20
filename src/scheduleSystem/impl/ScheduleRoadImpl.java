@@ -7,10 +7,17 @@ import scheduleSystem.ScheduleRoad;
 import java.util.*;
 
 public class ScheduleRoadImpl implements ScheduleRoad {
+    //key: road id, value: road
     Map<Integer, RoadInschedule> roads = new HashMap<>();
 
     public ScheduleRoadImpl(List<RoadInschedule> roads) {
+        for (RoadInschedule road : roads) {
+            this.roads.put(road.getId(), road);
+        }
+    }
 
+    public ScheduleRoadImpl(Map<Integer, RoadInschedule> roads) {
+        this.roads = roads;
     }
 
     public ScheduleRoadImpl() {
@@ -20,6 +27,26 @@ public class ScheduleRoadImpl implements ScheduleRoad {
     @Override
     public void updateOne(Lane lane) {
         Deque<CarInschedule> cars = lane.getCars();
+        updateCars(cars);
+        lane.setCars(cars);
+    }
+
+    public void updateOne(RoadInschedule road, int laneid, String fromTo) {
+        Map<String, List<Lane>> lanemap1 = road.getLanemap();
+        List<Lane> lanes1 = lanemap1.get(fromTo);
+        Lane lane1 = lanes1.get(laneid);
+        Deque<CarInschedule> cars = lane1.getCars();
+        updateCars(cars);
+        Map<String, List<Lane>> lanemap = road.getLanemap();
+        Lane lane = new Lane();
+        lane.setCars(cars);
+        List<Lane> lanes = lanemap.get(fromTo);
+        lanes.set(laneid, lane);
+        lanemap.put(fromTo, lanes);
+        road.setLanemap(lanemap);
+    }
+
+    public void updateCars(Deque<CarInschedule> cars) {
         Iterator<CarInschedule> it = cars.iterator();
         CarInschedule car;
         CarInschedule carLast = null;
@@ -37,7 +64,7 @@ public class ScheduleRoadImpl implements ScheduleRoad {
         }
     }
 
-    private void setCarByInfo(CarInschedule car, CarInschedule carLast) {
+    public void setCarByInfo(CarInschedule car, CarInschedule carLast) {
         //判断是否是第一辆车(最靠近下一个路口的车)
         if (carLast==null) {
             //如果此时间片该车到达出路口位置
@@ -45,6 +72,8 @@ public class ScheduleRoadImpl implements ScheduleRoad {
                 car.setWaitflag(true);
                 car.setLocation(car.getDistance());
                 car.setCanOutCross(true);
+                if (car.getNextroadid() == -1)
+                    car.setDone(true);
             } else {    //否则更新location
                 car.setLocation(car.getLocation()+car.getRealspeed());
                 car.setStopflag(true);
@@ -53,6 +82,11 @@ public class ScheduleRoadImpl implements ScheduleRoad {
             }
         } else {
             int s = carLast.getLocation() - car.getLocation();
+            if (s<0)
+                s=-s;
+            if (s==0)
+                s=1;
+//            System.out.println("s:"+s);
             //如果前面一辆车处于等待状态
             if (carLast.isWaitflag()) {
                 car.setWaitflag(true);  //更新状态
@@ -73,8 +107,8 @@ public class ScheduleRoadImpl implements ScheduleRoad {
     }
 
     @Override
-    public void updateOneRoad(RoadInschedule road) {
-        List<Lane> lanes = road.getLanes();
+    public void updateOneRoad(RoadInschedule road, String fromTo) {
+        List<Lane> lanes = road.getLanemap().get(fromTo);
         for (Lane lane : lanes) {
             updateOne(lane);
         }
@@ -83,8 +117,12 @@ public class ScheduleRoadImpl implements ScheduleRoad {
     @Override
     public void updateAll() {
         for (Map.Entry<Integer, RoadInschedule> entry : roads.entrySet()) {
-            updateOneRoad(entry.getValue());
+            RoadInschedule road = entry.getValue();
+            updateOneRoad(road, road.getBeginId()+"->"+road.getEndId());
+            if (road.isBidirectional())
+                updateOneRoad(road, road.getEndId()+"->"+road.getBeginId());
         }
+        ScheduleImpl.N++;
     }
 
     @Override

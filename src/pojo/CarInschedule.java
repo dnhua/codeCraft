@@ -1,9 +1,12 @@
 package pojo;
 
+import java.util.Objects;
+
 public class CarInschedule {
     private int id;
     private int roadid;
     private int nextroadid;
+    private int nextcrossid;
     private int laneid;
     private int location;
     private boolean waitflag = false;
@@ -13,7 +16,17 @@ public class CarInschedule {
     private int distance;
     private boolean canOutCross = false;
     private int roadspeedlimit;
+    private String fromTo;
+    private boolean done = false;   //是否到达目的地
     private int direction = 3;  //3直行，2是左转，1是右转。默认直行，在每次变为等待状态时应该更新方向。
+    private int destination;
+    public String getFromTo() {
+        return fromTo;
+    }
+
+    public void setFromTo(String fromTo) {
+        this.fromTo = fromTo;
+    }
 
     public int getLaneid() {
         return laneid;
@@ -117,5 +130,49 @@ public class CarInschedule {
 
     public void setNextroadid(int nextroadid) {
         this.nextroadid = nextroadid;
+    }
+
+    public int getDestination() {
+        return destination;
+    }
+
+    public void setDestination(int destination) {
+        this.destination = destination;
+    }
+
+    public int getNextcrossid() {
+        return nextcrossid;
+    }
+
+    public void setNextcrossid(int nextcrossid) {
+        this.nextcrossid = nextcrossid;
+    }
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CarInschedule that = (CarInschedule) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "CarInschedule{" +
+                "id=" + id +
+                '}';
     }
 }
